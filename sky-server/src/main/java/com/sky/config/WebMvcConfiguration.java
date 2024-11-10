@@ -51,6 +51,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
         Docket docket = new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo)
                 .select()
+                //包名写错会识别不到controller
                 .apis(RequestHandlerSelectors.basePackage("com.sky.controller"))
                 .paths(PathSelectors.any())
                 .build();
@@ -61,6 +62,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
      * 设置静态资源映射
      * @param registry
      */
+    //缺少会报404
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/doc.html").addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");

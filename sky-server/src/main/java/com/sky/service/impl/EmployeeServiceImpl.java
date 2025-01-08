@@ -3,6 +3,7 @@ package com.sky.service.impl;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
+import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.entity.Employee;
@@ -66,6 +67,9 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @return
      */
     public void save(EmployeeDTO employeeDTO) {
+
+        System.out.println("Current Thread id:" + Thread.currentThread().getId());
+
         Employee employee = new Employee();
         // set attributes
         //employee.setName(employee.getName());
@@ -85,8 +89,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         // Set the creation id and modification id of the current record
         // TODO Later you need to change to the id of the currently logged in user
-        employee.setCreateUser(10L);
-        employee.setUpdateUser(10L);
+        employee.setCreateUser(BaseContext.getCurrentId());
+        employee.setUpdateUser(BaseContext.getCurrentId());
 
         //insert this new employee
         employeeMapper.insert(employee);

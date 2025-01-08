@@ -87,6 +87,9 @@ public class EmployeeController {
     @ApiOperation("add a new employee")
     public Result save(@RequestBody EmployeeDTO employeeDTO){
         log.info("add a new employee: {}", employeeDTO);
+
+        System.out.println("Current Thread id:" + Thread.currentThread().getId());
+
         employeeService.save(employeeDTO);
         return Result.success();
     }

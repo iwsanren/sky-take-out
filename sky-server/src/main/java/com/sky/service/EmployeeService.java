@@ -39,4 +39,10 @@ public interface EmployeeService {
      */
     void startOrStop(Integer status, Long id);
 
+    /**
+     * Read employee message by id
+     * @param id
+     * @return
+     */
+    Employee getById(Long id);
 }

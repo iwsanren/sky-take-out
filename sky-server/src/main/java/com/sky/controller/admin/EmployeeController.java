@@ -121,6 +121,17 @@ public class EmployeeController {
         return Result.success();
     }
 
+    /**
+     * Read employee message by id
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    @ApiOperation("Read employee message by id")
+    public Result<Employee> getById(@PathVariable Long id){
+        Employee employee = employeeService.getById(id);
+        return Result.success(employee);
+    }
 
 
 

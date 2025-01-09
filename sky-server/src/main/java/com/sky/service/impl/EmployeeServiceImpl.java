@@ -127,7 +127,6 @@ public class EmployeeServiceImpl implements EmployeeService {
      * Enable or disable the account
      * @param status
      * @param id
-     * @return
      */
     public void startOrStop(Integer status, Long id) {
 //        Employee employee = new Employee();
@@ -145,11 +144,25 @@ public class EmployeeServiceImpl implements EmployeeService {
     /**
      * Read employee message by id
      * @param id
-     * @return
      */
     public Employee getById(Long id) {
         Employee employee = employeeMapper.getById(id);
         employee.setPassword("****");
         return employee;
+    }
+
+    /**
+     * Edit the employee information
+     * @param employeeDTO
+     */
+    public void update(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee();
+
+        BeanUtils.copyProperties(employeeDTO, employee);
+
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(BaseContext.getCurrentId());
+
+        employeeMapper.update(employee);
     }
 }

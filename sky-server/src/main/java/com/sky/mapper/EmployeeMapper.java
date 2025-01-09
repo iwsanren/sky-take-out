@@ -35,6 +35,10 @@ public interface EmployeeMapper {
     // we don't use annotate to write sql sentence, because it's dynamic. we use dynamic tag and write it into mapping file(EmployeeMapper.xml).
     Page<Employee> pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
 
-
-
+    /**
+     * Enable or disable the account
+     * @param employee
+     * @return
+     */
+    void update(Employee employee);
 }

@@ -1,5 +1,7 @@
 package com.sky.mapper;
 
+import com.github.pagehelper.Page;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
@@ -24,5 +26,15 @@ public interface EmployeeMapper {
             "values " +
             "(#{name}, #{username}, #{password}, #{phone},#{sex}, #{idNumber}, #{createTime}, #{updateTime}, #{createUser}, #{updateUser}, #{status})")
     void insert(Employee employee);
+
+    /**
+     * Employee Page Query
+     * @param employeePageQueryDTO
+     * @return
+     */
+    // we don't use annotate to write sql sentence, because it's dynamic. we use dynamic tag and write it into mapping file(EmployeeMapper.xml).
+    Page<Employee> pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
+
+
 
 }

@@ -91,13 +91,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         // Set the creation time and modification time of the current record
 
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
+//        employee.setCreateTime(LocalDateTime.now());
+//        employee.setUpdateTime(LocalDateTime.now());
 
         // Set the creation id and modification id of the current record
-        // TODO Later you need to change to the id of the currently logged in user
-        employee.setCreateUser(BaseContext.getCurrentId());
-        employee.setUpdateUser(BaseContext.getCurrentId());
+        // Later you need to change to the id of the currently logged in user
+//        employee.setCreateUser(BaseContext.getCurrentId());
+//        employee.setUpdateUser(BaseContext.getCurrentId());
 
         //insert this new employee
         employeeMapper.insert(employee);
@@ -160,8 +160,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         BeanUtils.copyProperties(employeeDTO, employee);
 
-        employee.setUpdateTime(LocalDateTime.now());
-        employee.setUpdateUser(BaseContext.getCurrentId());
+//        employee.setUpdateTime(LocalDateTime.now());
+//        employee.setUpdateUser(BaseContext.getCurrentId());
 
         employeeMapper.update(employee);
     }

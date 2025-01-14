@@ -39,6 +39,8 @@ public class CommonController {
         // Why is the parameter named file? Because it needs to match the parameter name in the body sent by the frontend.
         log.info("Upload files:{}", file);
 
+        String filePath = null;
+
         try {
             // get original file name
             String originalFilename = file.getOriginalFilename();
@@ -49,10 +51,12 @@ public class CommonController {
             String objectName = UUID.randomUUID().toString() + extension;
 
             // file request path
-            aliOssUtil.upload(file.getBytes(), objectName);
+            filePath = aliOssUtil.upload(file.getBytes(), objectName);
+
         } catch (IOException e) {
             log.error("The file failed to upload：{}", e);
+            return Result.error(MessageConstant.UPLOAD_FAILED);
         }
-        return Result.error(MessageConstant.UPLOAD_FAILED);
+        return Result.success(filePath);
     }
 }

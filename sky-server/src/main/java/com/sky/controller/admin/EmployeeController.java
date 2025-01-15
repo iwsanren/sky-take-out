@@ -104,7 +104,6 @@ public class EmployeeController {
         log.info("Employee Page Query:{}", employeePageQueryDTO);
         PageResult pageResult = employeeService.pageQuery(employeePageQueryDTO);
         return Result.success(pageResult);
-
     }
 
     /**

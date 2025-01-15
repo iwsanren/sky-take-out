@@ -2,12 +2,16 @@ package com.sky.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.constant.MessageConstant;
+import com.sky.constant.StatusConstant;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
+import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
+import com.sky.mapper.SetMealDishMapper;
 import com.sky.result.PageResult;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
@@ -28,6 +32,8 @@ public class DishServiceImpl implements DishService {
     private DishMapper dishMapper;
     @Autowired
     private DishFlavorMapper dishFlavorMapper;
+    @Autowired
+    private SetMealDishMapper setMealDishMapper;
 
     /**
      * add a new dish and relative flavor
@@ -56,9 +62,7 @@ public class DishServiceImpl implements DishService {
             });
             // Insert multiple records into the flavor table.
             dishFlavorMapper.insertBatch(flavors);
-
         }
-
     }
 
 
@@ -73,4 +77,70 @@ public class DishServiceImpl implements DishService {
         return new PageResult(page.getTotal(),page.getResult());
 
     }
+
+    /**
+     * Batch deletion of dishes
+     * @param ids
+     */
+    @Transactional
+    public void deleteBatch(List<Long> ids){
+        /**
+         * Business Rules:
+         * A dish can be deleted individually or in batches.
+         * Dishes that are currently on sale cannot be deleted.
+         * Dishes associated with a set meal cannot be deleted.
+         * When a dish is deleted, its related flavor data must also be deleted.
+         */
+
+        // Check if current dish can be deleted -- Are there any dishes currently on sale (status)?
+        // 1. Get every dish by id; 2. Check these dishes' status; 3. Throw exception if dishes cannot be deleted (on sale).
+        for(Long id : ids){
+            Dish dish = dishMapper.getById(id);
+            if(dish.getStatus() == StatusConstant.ENABLE){
+                // Dishes that are currently on sale cannot be deleted.
+                throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
+            }
+        }
+
+        // Check if current dish can be deleted -- Is it associated with a set meal?
+        List<Long> setMealIds = setMealDishMapper.getSetMealIdsByDishIds(ids);
+        if(setMealIds != null && setMealIds.size() > 0){
+            //Dishes associated with a set meal cannot be deleted.
+            throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
+        }
+
+        // Delete the dish data from the dish table.
+        // This for loop code is possible to generate so many sql sentences, so it can be Optimised.
+        /*for(Long id : ids){
+            dishMapper.deleteById(id);
+            // Delete the flavor data associated with the dish. - no need to check if this dish has relative flavor, delete it anyway
+            dishFlavorMapper.deleteByDishId(id);
+        }*/
+
+        // delete batch dish records by dish id collection
+        // sql: delete from dish where id in (?,?,?)
+        dishMapper.deleteByIds(ids);
+
+        // delete batch relative flavor records by dish id collection
+        // sql: delete from dish_flavor where dish_id in (?,?,?)
+        dishFlavorMapper.deleteByDishIds(ids);
+
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

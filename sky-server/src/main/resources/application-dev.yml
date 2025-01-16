@@ -11,7 +11,11 @@ sky:
     access-key-id: LTAI5tCn8dNZKRMo6JvK4Bby
     access-key-secret: XIeKaJCMYPEyErz8BYVtGfAnoofgNb
     bucket-name: sky-take-out-fun
-
+  redis:
+    host: localhost
+    port: 6379
+    password: 123456
+    database: 10 # 默认0
 #  s3:
 #    region: Europe (Ireland) eu-west-1
 #    access-key-id: AKIA45Y2RPMDNN4CUJP4

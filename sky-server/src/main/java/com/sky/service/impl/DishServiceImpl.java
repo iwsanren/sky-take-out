@@ -124,8 +124,54 @@ public class DishServiceImpl implements DishService {
         // delete batch relative flavor records by dish id collection
         // sql: delete from dish_flavor where dish_id in (?,?,?)
         dishFlavorMapper.deleteByDishIds(ids);
+    }
+
+    /**
+     * Enquiry dish by id
+     * @param id
+     * @return
+     */
+    @Transactional
+    public DishVO getByIdWithFlavor(Long id){
+        // Get dish record by id
+        Dish dish = dishMapper.getById(id);
+        // Get flavor record by dish_id
+        List<DishFlavor> dishFlavors = dishFlavorMapper.getByDishId(id);
+        // Encapsulate dish record and flavor record into DishVO Object
+        DishVO dishVO = new DishVO();
+        BeanUtils.copyProperties(dish, dishVO);
+        dishVO.setFlavors(dishFlavors);
+
+        return dishVO;
+    }
+
+    /**
+     * update the dish basic attributions' value and relative flavor attributions' value
+     * @param dishDTO
+     */
+    public void updateWithFlavor(DishDTO dishDTO){
+        Dish dish = new Dish();
+        BeanUtils.copyProperties(dishDTO,dish);
+
+        // update the dish basic attributions' value
+        dishMapper.update(dish);
+
+        // delete original flavor records
+        dishFlavorMapper.deleteByDishId(dishDTO.getId());
+
+        // insert flavor records again
+        List<DishFlavor> flavors = dishDTO.getFlavors();
+        if(flavors != null && flavors.size() > 0){
+            flavors.forEach(dishFlavor -> {
+                dishFlavor.setDishId(dishDTO.getId());
+            });
+            // Insert multiple records into the flavor table.
+            dishFlavorMapper.insertBatch(flavors);
+        }
 
     }
+
+
 }
 
 

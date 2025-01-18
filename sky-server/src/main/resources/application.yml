@@ -42,13 +42,21 @@ sky:
     admin-ttl: 72000000
     # 设置前端传递过来的令牌名称
     admin-token-name: token
+    # TODO : user-ttl多加了一个0
+    user-secret-key: piggy
+    user-ttl: 72000000
+    user-token-name: authentication
   alioss:
     endpoint: ${sky.alioss.endpoint}
     access-key-id: ${sky.alioss.access-key-id}
     access-key-secret: ${sky.alioss.access-key-secret}
     bucket-name: ${sky.alioss.bucket-name}
+  wechat:
+    appid: ${sky.wechat.appid}
+    secret: ${sky.wechat.secret}
 #  s3:
 #    region: ${sky.s3.region}
 #    access-key-id: ${sky.s3.access-key-id}
 #    access-key-secret: ${sky.s3.access-key-secret}
 #    bucket-name: ${sky.s3.bucket-name}
+

@@ -16,6 +16,9 @@ sky:
     port: 6379
     password: 123456
     database: 10 # 默认0
+  wechat:
+    appid: wx7598832b029bb7ea
+    secret: 91b16387e365b2790c9763de1fc6c5ce
 #  s3:
 #    region: Europe (Ireland) eu-west-1
 #    access-key-id: AKIA45Y2RPMDNN4CUJP4

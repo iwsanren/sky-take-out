@@ -84,4 +84,18 @@ public class SetmealServiceImpl implements SetmealService {
         setmealDishMapper.insertBatch(setmealDishes);
 
     }
+
+    /**
+     * page query
+     * @param setmealPageQueryDTO
+     * @return
+     */
+    public PageResult pageQuery(SetmealPageQueryDTO setmealPageQueryDTO) {
+        int pageNum = setmealPageQueryDTO.getPage();
+        int pageSize = setmealPageQueryDTO.getPageSize();
+
+        PageHelper.startPage(pageNum,pageSize);
+        Page<SetmealVO> page = setmealMapper.pageQuery(setmealPageQueryDTO);
+        return new PageResult(page.getTotal(),page.getResult());
+    }
 }

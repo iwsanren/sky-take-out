@@ -30,5 +30,10 @@ public interface SetmealService {
      */
     void saveWithDish(SetmealDTO setmealDTO);
 
-
+    /**
+     * page query
+     * @param setmealPageQueryDTO
+     * @return
+     */
+    PageResult pageQuery(SetmealPageQueryDTO setmealPageQueryDTO);
 }

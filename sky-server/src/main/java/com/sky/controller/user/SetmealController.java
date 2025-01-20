@@ -52,16 +52,6 @@ public class SetmealController {
         return Result.success(list);
     }
 
-    /**
-     * Add a new meal set
-     * @param setmealDTO
-     * @return
-     */
-    @PostMapping
-    @ApiOperation("Add a new meal set")
-    public Result save(@RequestBody SetmealDTO setmealDTO){
-        setmealService.saveWithDish(setmealDTO);
-        return Result.success();
-    }
+
 
 }

@@ -36,4 +36,12 @@ public interface SetmealService {
      * @return
      */
     PageResult pageQuery(SetmealPageQueryDTO setmealPageQueryDTO);
+
+    /**
+     * Batch delete sets
+     * @param ids
+     */
+    void deleteBatch(List<Long> ids);
+
+
 }

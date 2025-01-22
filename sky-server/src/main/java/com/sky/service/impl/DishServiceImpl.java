@@ -11,7 +11,7 @@ import com.sky.entity.DishFlavor;
 import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
-import com.sky.mapper.SetMealDishMapper;
+import com.sky.mapper.Setmealdishmapper;
 import com.sky.result.PageResult;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
@@ -34,7 +34,7 @@ public class DishServiceImpl implements DishService {
     @Autowired
     private DishFlavorMapper dishFlavorMapper;
     @Autowired
-    private SetMealDishMapper setMealDishMapper;
+    private Setmealdishmapper setMealDishMapper;
 
     /**
      * add a new dish and relative flavor
@@ -104,7 +104,7 @@ public class DishServiceImpl implements DishService {
         }
 
         // Check if current dish can be deleted -- Is it associated with a set meal?
-        List<Long> setMealIds = setMealDishMapper.getSetMealIdsByDishIds(ids);
+        List<Long> setMealIds = setMealDishMapper.getSetmealIdsByDishIds(ids);
         if(setMealIds != null && setMealIds.size() > 0){
             //Dishes associated with a set meal cannot be deleted.
             throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);

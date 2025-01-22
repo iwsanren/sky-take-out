@@ -6,13 +6,11 @@ import com.sky.constant.MessageConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
-import com.sky.entity.Dish;
 import com.sky.entity.Setmeal;
 import com.sky.entity.SetmealDish;
 import com.sky.exception.DeletionNotAllowedException;
-import com.sky.exception.SetmealEnableFailedException;
 import com.sky.mapper.DishMapper;
-import com.sky.mapper.SetMealDishMapper;
+import com.sky.mapper.Setmealdishmapper;
 import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.SetmealService;
@@ -35,7 +33,7 @@ public class SetmealServiceImpl implements SetmealService {
     @Autowired
     private SetmealMapper setmealMapper;
     @Autowired
-    private SetMealDishMapper setmealDishMapper;
+    private Setmealdishmapper setmealDishMapper;
     @Autowired
     private DishMapper dishMapper;
 
@@ -98,4 +96,50 @@ public class SetmealServiceImpl implements SetmealService {
         Page<SetmealVO> page = setmealMapper.pageQuery(setmealPageQueryDTO);
         return new PageResult(page.getTotal(),page.getResult());
     }
+
+    /**
+     * Batch delete sets
+     * @param ids
+     */
+    @Transactional
+    public void deleteBatch(List<Long> ids) {
+        ids.forEach( id -> {
+            Setmeal setmeal = setmealMapper.getById(id);
+            // Can't delete set on sale.
+            if(StatusConstant.ENABLE == setmeal.getStatus()){
+                throw new DeletionNotAllowedException(MessageConstant.SETMEAL_ON_SALE);
+            }
+        });
+
+        ids.forEach( setmealId -> {
+            // Delete record in the set sheet
+            setmealMapper.deleteById(setmealId);
+
+            // Delete record in set_dish sheet
+            setmealDishMapper.deleteBySetmealId(setmealId);
+        });
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

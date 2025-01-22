@@ -12,6 +12,8 @@ import org.apache.ibatis.annotations.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * set administration
  */
@@ -47,6 +49,18 @@ public class SetmealController {
     public Result<PageResult> page(SetmealPageQueryDTO setmealPageQueryDTO){
         PageResult pageResult = setmealService.pageQuery(setmealPageQueryDTO);
         return Result.success(pageResult);
+    }
+
+    /**
+     * Batch delete sets
+     * @param ids
+     * @return
+     */
+    @DeleteMapping
+    @ApiOperation("Batch delete sets")
+    public Result delete(@RequestParam List<Long> ids){
+        setmealService.deleteBatch(ids);
+        return null;
     }
 
 }

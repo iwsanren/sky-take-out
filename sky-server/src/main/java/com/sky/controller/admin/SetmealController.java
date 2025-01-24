@@ -2,9 +2,11 @@ package com.sky.controller.admin;
 
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
+import com.sky.entity.Setmeal;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.SetmealService;
+import com.sky.vo.SetmealVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -62,5 +64,31 @@ public class SetmealController {
         setmealService.deleteBatch(ids);
         return null;
     }
+
+    /**
+     * Query set meal by ID for displaying data on the edit page.
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    @ApiOperation("Get set by id")
+    public Result<SetmealVO> getById(@PathVariable Long id){
+        SetmealVO setmealVO = setmealService.getByIdWithDish(id);
+        return Result.success(setmealVO);
+    }
+
+    /**
+     * Update set meal
+     * @param setmealDTO
+     * @return
+     */
+    @PutMapping
+    @ApiOperation("Update set meal")
+    public Result update(@RequestBody SetmealDTO setmealDTO){
+        setmealService.update(setmealDTO);
+        return Result.success();
+    }
+
+
 
 }

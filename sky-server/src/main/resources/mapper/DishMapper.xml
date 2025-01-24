@@ -29,7 +29,6 @@
         <foreach collection="ids" open="(" close=")" separator="," item="id">
             #{id}
         </foreach>
-
     </delete>
 
     <update id="update">

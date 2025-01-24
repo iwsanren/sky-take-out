@@ -21,6 +21,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 /**
@@ -39,6 +40,7 @@ public class SetmealServiceImpl implements SetmealService {
 
     /**
      * 条件查询
+     *
      * @param setmeal
      * @return
      */
@@ -49,6 +51,7 @@ public class SetmealServiceImpl implements SetmealService {
 
     /**
      * 根据id查询菜品选项
+     *
      * @param id
      * @return
      */
@@ -58,12 +61,13 @@ public class SetmealServiceImpl implements SetmealService {
 
     /**
      * Add a new meal set and save the relationship between dish and set at the same time.
+     *
      * @param setmealDTO
      */
     @Override
     public void saveWithDish(SetmealDTO setmealDTO) {
         Setmeal setmeal = new Setmeal();
-        BeanUtils.copyProperties(setmealDTO,setmeal);
+        BeanUtils.copyProperties(setmealDTO, setmeal);
 
         // Insert a record into the set meal sheet.
         setmealMapper.insert(setmeal);
@@ -85,6 +89,7 @@ public class SetmealServiceImpl implements SetmealService {
 
     /**
      * page query
+     *
      * @param setmealPageQueryDTO
      * @return
      */
@@ -92,32 +97,84 @@ public class SetmealServiceImpl implements SetmealService {
         int pageNum = setmealPageQueryDTO.getPage();
         int pageSize = setmealPageQueryDTO.getPageSize();
 
-        PageHelper.startPage(pageNum,pageSize);
+        PageHelper.startPage(pageNum, pageSize);
         Page<SetmealVO> page = setmealMapper.pageQuery(setmealPageQueryDTO);
-        return new PageResult(page.getTotal(),page.getResult());
+        return new PageResult(page.getTotal(), page.getResult());
     }
 
     /**
      * Batch delete sets
+     *
      * @param ids
      */
     @Transactional
     public void deleteBatch(List<Long> ids) {
-        ids.forEach( id -> {
+        ids.forEach(id -> {
             Setmeal setmeal = setmealMapper.getById(id);
             // Can't delete set on sale.
-            if(StatusConstant.ENABLE == setmeal.getStatus()){
+            if (StatusConstant.ENABLE == setmeal.getStatus()) {
                 throw new DeletionNotAllowedException(MessageConstant.SETMEAL_ON_SALE);
             }
         });
 
-        ids.forEach( setmealId -> {
+        ids.forEach(setmealId -> {
             // Delete record in the set sheet
             setmealMapper.deleteById(setmealId);
 
             // Delete record in set_dish sheet
             setmealDishMapper.deleteBySetmealId(setmealId);
         });
+    }
+
+    /**
+     * the sets and the associations between set meals and dishes by setmeal id
+     *
+     * @param id
+     * @return
+     */
+    public SetmealVO getByIdWithDish(Long id) {
+        Setmeal setmeal = setmealMapper.getById(id);
+        List<SetmealDish> setmealDishes = setmealDishMapper.getBySetmealId(id);
+
+        SetmealVO setmealVO = new SetmealVO();
+        BeanUtils.copyProperties(setmeal, setmealVO);
+
+        setmealVO.setSetmealDishes(setmealDishes);
+
+        return setmealVO;
+    }
+
+    /**
+     * Update set meal
+     *
+     * @param setmealDTO
+     */
+    @Transactional
+    public void update(SetmealDTO setmealDTO) {
+        Setmeal setmeal = new Setmeal();
+        BeanUtils.copyProperties(setmealDTO, setmeal);
+
+        // 1. Update the set meal table by executing an Update operation
+        setmealMapper.update(setmeal);
+
+        Long setmealId = setmeal.getId();
+        // 2. Remove the association between the set meal and dishes by executing a DELETE operation on the setmeal_dish table
+        setmealDishMapper.deleteBySetmealId(setmealId);
+        List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
+        setmealDishes.forEach(setmealDish -> {
+            setmealDish.setSetmealId(setmealId);
+        });
+        /*
+        🔹 forEach 遍历 setmealDishes，为每个 SetmealDish 设置 setmealId。
+        为什么要设置 setmealId？
+        setmealDishes 来源于前端，但前端通常不会提供 setmealId，只会提供菜品信息（如 dishId）。
+        但在数据库中，setmeal_dish 需要存储 套餐ID 和 菜品ID，确保数据正确关联。
+        由于 setmealId 在 setmealDTO 里是有的，我们遍历每个 SetmealDish 并手动设置 setmealId，确保它们关联到正确的套餐。
+         */
+
+        // 3. Reinsert the association between the set meal and dishes by executing an INSERT operation on the setmeal_dish table
+        setmealDishMapper.insertBatch(setmealDishes);
+
     }
 }
 

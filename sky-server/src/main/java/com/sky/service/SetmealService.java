@@ -43,5 +43,18 @@ public interface SetmealService {
      */
     void deleteBatch(List<Long> ids);
 
+    /**
+     * Get the sets and the associations between set meals and dishes by setmeal id
+     * @param id
+     * @return
+     */
+    SetmealVO getByIdWithDish(Long id);
+
+    /**
+     * Update set meal
+     * @param setmealDTO
+     */
+    void update(SetmealDTO setmealDTO);
+
 
 }

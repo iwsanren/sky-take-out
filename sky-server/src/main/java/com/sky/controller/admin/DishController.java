@@ -11,9 +11,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Dish administration
@@ -26,6 +28,8 @@ public class DishController {
 
     @Autowired
     private DishService dishService;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     /**
      * add a new dish
@@ -37,6 +41,27 @@ public class DishController {
     public Result save(@RequestBody DishDTO dishDTO){
         log.info("Add a new dish:{}", dishDTO);
         dishService.saveWithFlavor(dishDTO);
+
+        // Clear cached data
+        String key = "dish_" + dishDTO.getCategoryId();
+        cleanCache("key");
+        return Result.success();
+    }
+
+    /**
+     * Dish activation and deactivation.
+     *
+     * @param status
+     * @param id
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    @ApiOperation("Dish activation and deactivation.")
+    public Result<String> startOrStop(@PathVariable Integer status, Long id) {
+        dishService.startOrStop(status, id);
+
+        cleanCache("dish_*");
+
         return Result.success();
     }
 
@@ -63,6 +88,10 @@ public class DishController {
     public Result delete(@RequestParam List<Long> ids){
         log.info("Batch deletion of dishes:{}", ids);
         dishService.deleteBatch(ids);
+
+        // Clear all cached dish data, removing all keys that start with "dish_".
+        cleanCache("dish_*");
+
         return Result.success();
     }
 
@@ -91,6 +120,12 @@ public class DishController {
         // update the dish basic attribution and relative flavor attribution
         dishService.updateWithFlavor(dishDTO);
 
+        //In complex cases: When modifying a dish, if only general attributes such as name or price are changed,
+        // updating a single cached entry is sufficient.
+        // However, if the dish category is modified, multiple cache entries need to be handled.
+        // To simplify the process, all cached data will be cleared after modifying a dish.
+        cleanCache("dish_*");
+
         return Result.success();
     }
 
@@ -105,4 +140,15 @@ public class DishController {
         List<Dish> list = dishService.list(categoryId);
         return Result.success(list);
     }
+
+    /**
+     * Clean cached data
+     * @param pattern
+     */
+    private void cleanCache(String pattern){
+        Set keys = redisTemplate.keys(pattern);
+        redisTemplate.delete(keys);
+    }
+
+
 }

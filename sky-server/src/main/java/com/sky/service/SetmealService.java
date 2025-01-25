@@ -56,5 +56,10 @@ public interface SetmealService {
      */
     void update(SetmealDTO setmealDTO);
 
-
+    /**
+     * Start or stop selling the set
+     * @param status
+     * @param id
+     */
+    void startOrStop(Integer status, Long id);
 }

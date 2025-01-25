@@ -6,9 +6,11 @@ import com.sky.constant.MessageConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
+import com.sky.entity.Dish;
 import com.sky.entity.Setmeal;
 import com.sky.entity.SetmealDish;
 import com.sky.exception.DeletionNotAllowedException;
+import com.sky.exception.SetmealEnableFailedException;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.Setmealdishmapper;
 import com.sky.mapper.SetmealMapper;
@@ -175,6 +177,33 @@ public class SetmealServiceImpl implements SetmealService {
         // 3. Reinsert the association between the set meal and dishes by executing an INSERT operation on the setmeal_dish table
         setmealDishMapper.insertBatch(setmealDishes);
 
+    }
+
+    /**
+     * Start or stop selling the set
+     * @param status
+     * @param id
+     */
+    public void startOrStop(Integer status, Long id) {
+        // Before activating a set meal, check if it contains any discontinued dishes.
+        // If discontinued dishes are present, display the prompt:
+        // "The set meal contains unavailable items and cannot be activated."
+        if(status == StatusConstant.ENABLE){
+            List<Dish> dishList = dishMapper.getBySetmealId(id);
+            if(dishList != null && dishList.size() > 0){
+                dishList.forEach(dish -> {
+                    if(StatusConstant.DISABLE == dish.getStatus()){
+                        throw new SetmealEnableFailedException(MessageConstant.SETMEAL_ENABLE_FAILED);
+                    }
+                });
+            }
+        }
+
+        Setmeal setmeal = Setmeal.builder()
+                .id(id)
+                .status(status)
+                .build();
+        setmealMapper.update(setmeal);
     }
 }
 

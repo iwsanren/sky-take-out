@@ -89,6 +89,17 @@ public class SetmealController {
         return Result.success();
     }
 
-
+    /**
+     * Start or stop selling the set
+     * @param status
+     * @param id
+     * @return
+     */
+    @PostMapping("status/{status}")
+    @ApiOperation("Start or stop selling the set")
+    public Result startOrStop(@PathVariable Integer status, Long id){
+        setmealService.startOrStop(status ,id);
+        return Result.success();
+    }
 
 }

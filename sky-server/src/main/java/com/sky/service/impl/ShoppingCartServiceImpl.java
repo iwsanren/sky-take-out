@@ -74,9 +74,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             shoppingCart.setCreateTime(LocalDateTime.now());
 
             shoppingCartMapper.insert(shoppingCart);
-
         }
-
     }
 
     /**
@@ -99,5 +97,39 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     public void cleanShoppingCart() {
         Long userId = BaseContext.getCurrentId();
         shoppingCartMapper.deleteByUserId(userId);
+    }
+
+    /**
+     * Delete an item in the shopping cart
+     * @param shoppingCartDTO
+     */
+    public void subShoppingCart(ShoppingCartDTO shoppingCartDTO) {
+        ShoppingCart shoppingCart = new ShoppingCart();
+        BeanUtils.copyProperties(shoppingCartDTO, shoppingCart);
+
+        // Get the current user id:
+        Long userId = BaseContext.getCurrentId();
+        shoppingCart.setUserId(userId);
+
+        List<ShoppingCart> list = shoppingCartMapper.list(shoppingCart);
+
+        if(list != null && list.size() > 0){
+            shoppingCart = list.get(0);
+            Integer number = shoppingCart.getNumber();
+            if(number == 1){
+                // Only one current item exists in the shopping cart
+                shoppingCartMapper.deleteById(shoppingCart.getId());
+            }else{
+                shoppingCart.setNumber(number - 1);
+                shoppingCartMapper.updateNumberById(shoppingCart);
+            }
+
+
+
+        }
+
+
+
+
     }
 }

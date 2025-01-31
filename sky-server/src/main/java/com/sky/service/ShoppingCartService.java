@@ -18,4 +18,9 @@ public interface ShoppingCartService {
      * @return
      */
     List<ShoppingCart> showShoppingCart();
+
+    /**
+     * clean the shopping cart
+     */
+    void cleanShoppingCart();
 }

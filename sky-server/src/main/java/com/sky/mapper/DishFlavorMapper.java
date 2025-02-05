@@ -30,7 +30,7 @@ public interface DishFlavorMapper {
 
     /**
      * Get flavor record by dish_id
-     * @param id
+     * @param dishId
      * @return
      */
     @Select("select * from dish_flavor where dish_id = #{dishId}")
